@@ -2,6 +2,7 @@
 using ApiCatalog.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalog.Controllers
 {
@@ -28,7 +29,7 @@ namespace ApiCatalog.Controllers
             return prodtutos;
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name= "ObeterProduto")]
         public ActionResult<Produtos> Get(int id)
         {
             var produtos = _context.Produtos.FirstOrDefault(p=> p.Id == id);
@@ -38,5 +39,49 @@ namespace ApiCatalog.Controllers
             }
             return produtos;
         }
+    
+        [HttpPost]
+        public ActionResult Post(Produtos produto)
+        {
+            if (produto is null)
+            {
+                return BadRequest();
+            }
+            
+            _context.Produtos.Add(produto);
+            _context.SaveChanges();
+
+            return new CreatedAtRouteResult("ObeterProduto", new { id = produto.Id }, produto);
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Produtos produto)
+        {
+            if (id != produto.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(produto).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Ok(produto);
+        }
+
+        [HttpDelete("{id:int}")]
+        public ActionResult Delete(int id)
+        {
+            var produto = _context.Produtos.FirstOrDefault(p => p.Id == id);
+            if (produto is null)
+            {
+                return NotFound("produto nao localizado");
+            }
+
+            _context.Produtos.Remove(produto);
+            _context.SaveChanges();
+
+            return Ok(produto);
+        }
+        
     }
 }
