@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ApiCatalog.Model
 {
@@ -28,6 +29,8 @@ namespace ApiCatalog.Model
         public DateTime DataCadastro { get; set; }
 
         public int CategoriaId { get; set; }
+
+        [JsonIgnore] // com isso em determinad propriedade, ela nao sera mostrada quando chamar ela no swager 
         public Categoria? Categoria { get; set; }
     }
 }

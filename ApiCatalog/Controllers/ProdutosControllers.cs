@@ -2,6 +2,7 @@
 using ApiCatalog.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiCatalog.Controllers
@@ -17,6 +18,11 @@ namespace ApiCatalog.Controllers
             _context = context;
         }
 
+        [HttpGet("/asincro")]
+        public async Task<ActionResult<IEnumerable<Produtos>>> Getasincro()
+        {
+            return await _context.Produtos.AsNoTracking().ToListAsync();
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<Produtos>> Get()
@@ -30,9 +36,11 @@ namespace ApiCatalog.Controllers
         }
 
         [HttpGet("{id:int}", Name= "ObeterProduto")]
-        public ActionResult<Produtos> Get(int id)
+        public async Task<ActionResult<Produtos>> Get(int id, [BindRequired]string nome)
         {
-            var produtos = _context.Produtos.FirstOrDefault(p=> p.Id == id);
+            var nomeProduto = nome;
+            var produtos = await _context.Produtos.FirstOrDefaultAsync(p=> p.Id == id);
+
             if (produtos == null)
             {
                 return NotFound();

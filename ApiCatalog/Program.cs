@@ -1,20 +1,25 @@
 using ApiCatalog.Context;
+using ApiCatalog.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => 
+                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); // com isso ignora um erro que tava dando ao fazer chamada que se repetiam 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 string MySqlConnectio = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(MySqlConnectio, ServerVersion.AutoDetect(MySqlConnectio)));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql
+(MySqlConnectio, ServerVersion.AutoDetect(MySqlConnectio)));
 
-
+builder.Services.AddTransient<IMeuServico, MeuServico>(); // adicionando o serviço
 
 var app = builder.Build();
 

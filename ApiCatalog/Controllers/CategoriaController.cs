@@ -1,5 +1,6 @@
 ﻿using ApiCatalog.Context;
 using ApiCatalog.Model;
+using ApiCatalog.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,19 +29,53 @@ namespace ApiCatalog.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            return _context.Categorias.ToList();
+            try
+            {
+                return _context.Categorias.AsNoTracking().ToList();
+            }
+            catch (Exception)
+            {
+                // tratamento de erro para cada end point 
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        "Ocorreu um problema ao tratar a sua solicitação");
+            }
+            
         }
+
+
+        [HttpGet("FromServices/{nome}")]
+        public ActionResult<string> GetSaudacoesFromServices([FromServices] IMeuServico meuSevico, string nome)
+        {
+            return meuSevico.Saudacao(nome);
+        }
+
+        [HttpGet("semFromServices/{nome}")]
+        public ActionResult<string> GetSaudacoesSemFromServices( IMeuServico meuSevico, string nome)
+        {
+            return meuSevico.Saudacao(nome);
+        }
+
+
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> get(int id)
         {
-            var categoria = _context.Categorias.SingleOrDefault(p => p.CategoriaId == id);
-
-            if (categoria == null)
+            try
             {
-                return NotFound();
+                var categoria = _context.Categorias.SingleOrDefault(p => p.CategoriaId == id);
+
+                if (categoria == null)
+                {
+                    return NotFound();
+                }
+                return Ok(categoria);
             }
-            return Ok(categoria);
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        "Ocorreu um problema ao tratar a sua solicitação"); 
+            }
         }
 
         [HttpPost]
@@ -61,7 +96,7 @@ namespace ApiCatalog.Controllers
         {
             if(id != categoria.CategoriaId)
             {
-                return BadRequest();
+                return BadRequest($"Categoria com Id={id} nao encontrada");
             }
             _context.Entry(categoria).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.SaveChanges();
@@ -75,7 +110,7 @@ namespace ApiCatalog.Controllers
             var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
             if (categoria is null)
             {
-                return NotFound("produto nao localizado");
+                return NotFound($"produto com id={id} nao localizado");
             }
 
             _context.Categorias.Remove(categoria);
