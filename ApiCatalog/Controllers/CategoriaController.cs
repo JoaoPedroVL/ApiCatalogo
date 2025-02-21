@@ -1,4 +1,5 @@
 ﻿using ApiCatalog.Context;
+using ApiCatalog.Filters;
 using ApiCatalog.Model;
 using ApiCatalog.Services;
 using Microsoft.AspNetCore.Http;
@@ -26,12 +27,13 @@ namespace ApiCatalog.Controllers
 
 
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        [HttpGet("filter")]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
+        public async Task<ActionResult<IEnumerable<Categoria>>> Get()
         {
             try
             {
-                return _context.Categorias.AsNoTracking().ToList();
+                return await _context.Categorias.AsNoTracking().ToListAsync();
             }
             catch (Exception)
             {
