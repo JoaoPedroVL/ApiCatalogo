@@ -24,7 +24,7 @@ namespace ApiCatalog.Controllers
             return await _context.Produtos.AsNoTracking().ToListAsync();
         }
 
-        [HttpGet]
+        [HttpGet("/verproduto")]
         public ActionResult<IEnumerable<Produtos>> Get()
         {
             var prodtutos = _context.Produtos.ToList();
@@ -35,7 +35,7 @@ namespace ApiCatalog.Controllers
             return prodtutos;
         }
 
-        [HttpGet("{id:int}", Name= "ObeterProduto")]
+        [HttpGet("/verprodutoUnico{id:int}", Name= "ObeterProduto")]
         public async Task<ActionResult<Produtos>> Get(int id, [BindRequired]string nome)
         {
             var nomeProduto = nome;
@@ -48,7 +48,7 @@ namespace ApiCatalog.Controllers
             return produtos;
         }
     
-        [HttpPost]
+        [HttpPost("/criarproduto")]
         public ActionResult Post(Produtos produto)
         {
             if (produto is null)

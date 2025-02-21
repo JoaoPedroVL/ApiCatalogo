@@ -1,17 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ApiCatalog.Validations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace ApiCatalog.Model
 {
     [Table("Produtos")]
-    public class Produtos
+    public class Produtos : IValidatableObject
     {
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="O nome é obrigatorio")]
         [StringLength(80)]
+        //[PrimeiraLetraMaiuscula]// validation
         public string?  Nome { get; set; }
 
         [Required]
@@ -32,5 +34,18 @@ namespace ApiCatalog.Model
 
         [JsonIgnore] // com isso em determinad propriedade, ela nao sera mostrada quando chamar ela no swager 
         public Categoria? Categoria { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)//apenas para esse modelo, nao posso usar em outro parte do codigo, diferente da outra 
+        {
+            if (!string.IsNullOrEmpty(Nome))
+            {
+                var primeraletra = this.Nome[0].ToString();
+                if(primeraletra != primeraletra.ToUpper())
+                {
+                    yield return new ValidationResult("Primeira letra do nome deve ser maiuscula", 
+                        new[] { nameof(this.Nome) });
+                }
+            }
+        }
     }
 }

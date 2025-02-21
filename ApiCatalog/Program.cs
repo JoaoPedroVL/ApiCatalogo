@@ -2,6 +2,7 @@ using ApiCatalog.Context;
 using ApiCatalog.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+//using ApiCatalog.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,16 +25,35 @@ builder.Services.AddTransient<IMeuServico, MeuServico>(); // adicionando o servi
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())// midware sao definidios aqui usando APP
 {
+
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+
+
+app.UseAuthentication(); // altenticação antes do autorização
+
+app.UseAuthorization(); // autorização 
+
+app.Use(async (context, next) =>
+{
+    //codigo antes do request
+    await next(context);
+    //adicionar codigo depois do request
+});
 
 app.MapControllers();
+
+//app.Run(async (context) =>
+//{
+//    await context.Response.WriteAsync("Final");
+//});
 
 app.Run();

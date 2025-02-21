@@ -42,7 +42,7 @@ namespace ApiCatalog.Controllers
             
         }
 
-
+        
         [HttpGet("FromServices/{nome}")]
         public ActionResult<string> GetSaudacoesFromServices([FromServices] IMeuServico meuSevico, string nome)
         {
@@ -54,12 +54,15 @@ namespace ApiCatalog.Controllers
         {
             return meuSevico.Saudacao(nome);
         }
-
+        
 
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> get(int id)
         {
+
+            //throw new Exception("Exeção ao retornar a categoria pelo id");
+
             try
             {
                 var categoria = _context.Categorias.SingleOrDefault(p => p.CategoriaId == id);
