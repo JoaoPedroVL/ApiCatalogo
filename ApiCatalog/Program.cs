@@ -1,5 +1,6 @@
 using ApiCatalog.Context;
 using ApiCatalog.Filters;
+using ApiCatalog.Logging;
 using ApiCatalog.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -23,6 +24,11 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql
 
 builder.Services.AddTransient<IMeuServico, MeuServico>(); // adicionando o serviço
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    LogLevel = LogLevel.Information
+}));
 
 
 

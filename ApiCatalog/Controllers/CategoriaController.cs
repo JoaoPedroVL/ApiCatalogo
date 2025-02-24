@@ -5,6 +5,7 @@ using ApiCatalog.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ApiCatalog.Controllers
 {
@@ -13,9 +14,11 @@ namespace ApiCatalog.Controllers
     public class CategoriaController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriaController(AppDbContext context)
+        public CategoriaController(AppDbContext context, ILogger<CategoriaController> logger)
         {
+            _logger = logger;
             _context = context;
         }
 
@@ -65,12 +68,16 @@ namespace ApiCatalog.Controllers
 
             //throw new Exception("Exeção ao retornar a categoria pelo id");
 
+            _logger.LogInformation($"#################################### GET Api/Categoria/id = {id} ###########");
+
+
             try
             {
                 var categoria = _context.Categorias.SingleOrDefault(p => p.CategoriaId == id);
 
                 if (categoria == null)
                 {
+                    _logger.LogInformation($"#################################### GET Api/Categoria/id = {id} NOT FUDN ###########");
                     return NotFound();
                 }
                 return Ok(categoria);
